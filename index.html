@@ -55,12 +55,28 @@
     #hero { scroll-margin-top: 150px; } #catalog { scroll-margin-top: 140px; } #reviews { scroll-margin-top: 140px; }
     #back-to-top { opacity: 0; visibility: hidden; transition: all 0.3s ease; }
     #back-to-top.visible { opacity: 1; visibility: visible; }
+
+    /* 🦴 SKELETON LOADERS */
+    .skeleton {
+      background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 0.5rem;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .skeleton-card { background-color: #1a1a1a; border-radius: 1rem; padding: 1rem; border: 1px solid #1f2937; }
+    .skeleton-img { height: 208px; margin-bottom: 1rem; }
+    .skeleton-title { height: 20px; width: 70%; margin-bottom: 0.5rem; }
+    .skeleton-subtitle { height: 14px; width: 50%; margin-bottom: 1rem; }
+    .skeleton-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .skeleton-btn { height: 32px; flex: 1; }
+    .skeleton-price { height: 32px; width: 100px; margin-top: 0.75rem; }
   </style>
 </head>
 <body class="antialiased">
 
 <script>
-  // 🔥 TU CONFIGURACIÓN DE FIREBASE (INTEGRADA)
+  // 🔥 TU CONFIGURACIÓN DE FIREBASE
   const firebaseConfig = {
     apiKey: "AIzaSyDPQHc1TPeyZLbmfLQDzin68r9vvM8jX8k",
     authDomain: "la-hinchada-cf1a2.firebaseapp.com",
@@ -125,7 +141,7 @@
     if (!nombre || !nombre.trim()) return null;
     const direccion = prompt("🏠 Paso 2/3: Introduce tu DIRECCIÓN (calle, número, piso/puerta):");
     if (!direccion || !direccion.trim()) return null;
-    const ciudad = prompt("📍 Paso 3/3: Introduce tu CIUDAD y CÓDIGO POSTAL:");
+    const ciudad = prompt(" Paso 3/3: Introduce tu CIUDAD y CÓDIGO POSTAL:");
     if (!ciudad || !ciudad.trim()) return null;
     return { nombre: nombre.trim(), direccion: direccion.trim(), ciudad: ciudad.trim() };
   }
@@ -209,7 +225,6 @@
     ).join('');
   }
 
-  // ✅ CORREGIDO: Acepta lista personalizada para el buscador
   function renderProducts(leagueKey, customList = null) {
     const grid = document.getElementById('products-grid');
     if(!grid) return;
@@ -217,33 +232,48 @@
     let list;
     
     if (customList) {
-      // Modo búsqueda: usar la lista filtrada
       list = customList;
-      // Quitar clase active de todas las ligas
       document.querySelectorAll('.league-btn').forEach(b => b.classList.remove('active'));
     } else {
-      // Modo normal: cargar desde la liga seleccionada
       const league = TEAMS[leagueKey];
       if(!league || !league.teams) { 
-        grid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-8">Cargando equipos...</p>'; 
+        // 🦴 MUESTRA SKELETONS MIENTRAS CARGA
+        grid.innerHTML = Array(8).fill(0).map(() => `
+          <div class="skeleton-card">
+            <div class="skeleton skeleton-img"></div>
+            <div class="skeleton skeleton-title"></div>
+            <div class="skeleton skeleton-subtitle"></div>
+            <div class="skeleton-row">
+              <div class="skeleton skeleton-btn"></div>
+              <div class="skeleton skeleton-btn"></div>
+              <div class="skeleton skeleton-btn"></div>
+            </div>
+            <div class="flex justify-between items-center">
+              <div class="skeleton skeleton-price"></div>
+              <div class="skeleton skeleton-btn" style="width: 100px;"></div>
+            </div>
+          </div>
+        `).join('');
         return; 
       }
       const teamsArray = Object.values(league.teams);
       list = teamsArray.map(t => ({...t, leagueName: league.name, leagueKey}));
       
-      // Marcar liga activa
       document.querySelectorAll('.league-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.league === leagueKey);
       });
     }
 
-    // Renderizar productos
-    grid.innerHTML = list.map(team => `
+    grid.innerHTML = list.map(team => {
+      // ️ LÓGICA DE IMÁGENES: Prioriza Firebase Storage, si no existe busca en carpetas locales
+      const imgSrc = team.imageUrl || getJerseyImage(team.leagueKey, team.name, 1, 'png');
+      const imgOnError = team.imageUrl ? '' : `onerror="tryLoadImage(this, '${team.leagueKey}', '${team.name.replace(/'/g, "\\'")}', 1)"`;
+      
+      return `
       <div class="product-card animate-fadeIn">
         <div class="mb-4 bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-xl p-3 border border-gray-700">
-          <img id="img-${team.id}" src="${getJerseyImage(team.leagueKey, team.name, 1, 'png')}" alt="${team.name}" loading="lazy"
-               class="w-full h-52 object-contain drop-shadow-2xl transition-all duration-300 hover:scale-105"
-               onerror="tryLoadImage(this, '${team.leagueKey}', '${team.name.replace(/'/g, "\\'")}', 1)">
+          <img id="img-${team.id}" src="${imgSrc}" alt="${team.name}" loading="lazy" ${imgOnError}
+               class="w-full h-52 object-contain drop-shadow-2xl transition-all duration-300 hover:scale-105">
         </div>
         <div class="flex items-center gap-3 mb-3">
           <div class="badge-placeholder text-lg">${team.badge || '⚽'}</div>
@@ -271,7 +301,7 @@
           <button type="button" onclick="addToCart('${team.id}', '${team.name}', '${team.leagueName}')" class="btn-primary text-sm px-5 py-2.5">Añadir +</button>
         </div>
       </div>
-    `).join('');
+    `}).join('');
   }
 
   function filterByLeague(key) {
@@ -320,7 +350,7 @@
     else {
       container.innerHTML = items.map((item,i)=>`
         <div class="flex justify-between items-start py-3 border-b border-gray-800 last:border-0">
-          <div class="flex-1"><p class="font-medium">${item.teamName}</p><p class="text-sm text-gray-400">${item.leagueName} • ${item.kitLabel} • Talla ${item.size}</p>${item.personalized?`<p class="text-xs text-neon mt-1">✏️ ${item.name} #${item.number}</p>`:''}</div>
+          <div class="flex-1"><p class="font-medium">${item.teamName}</p><p class="text-sm text-gray-400">${item.leagueName} • ${item.kitLabel} • Talla ${item.size}</p>${item.personalized?`<p class="text-xs text-neon mt-1">️ ${item.name} #${item.number}</p>`:''}</div>
           <div class="text-right"><p class="font-bold text-neon">${formatPrice(item.finalPrice)}</p><button type="button" onclick="removeFromCart(${i})" class="text-xs text-red-400 hover:text-red-300 mt-1">Eliminar</button></div>
         </div>`).join('');
       container.innerHTML += `
@@ -346,10 +376,10 @@
     items.forEach((item, i) => {
       s += `${i+1}. ${item.teamName} (${item.leagueName})\n   🎽 ${item.kitLabel} | 📏 Talla: ${item.size}\n`;
       if(item.personalized) s += `   ✏️ ${item.name} #${item.number}\n`;
-      s += `   💰 ${formatPrice(item.finalPrice)}${isBundle ? ' (Promo)' : ''}\n\n`;
+      s += `    ${formatPrice(item.finalPrice)}${isBundle ? ' (Promo)' : ''}\n\n`;
     });
     s += `━━━━━━━━━━━━━━━━━━\n`;
-    if (isBundle) s += `🎉 *Descuento aplicado: -${formatPrice(discount)}*\n`;
+    if (isBundle) s += ` *Descuento aplicado: -${formatPrice(discount)}*\n`;
     s += `*TOTAL A PAGAR: ${formatPrice(total)}*\n`;
     if (shipping) {
       s += `\n📦 *DATOS DE ENVÍO:*\n👤 ${shipping.nombre}\n🏠 ${shipping.direccion}\n📍 ${shipping.ciudad}`;
@@ -371,42 +401,24 @@
     window.open(`https://t.me/${TELEGRAM_USER.replace('@','')}?text=${encodeURIComponent(generateOrderSummary(shipping))}`, '_blank');
   }
 
-  // ✅ BUSCADOR CORREGIDO
+  // ================= BUSCADOR =================
   function initSearch() {
     const input = document.getElementById('search-input'); 
     if(!input) return;
-    
     input.addEventListener('input', (e) => {
       const q = e.target.value.trim().toLowerCase();
       const banner = document.getElementById('promo-banner');
-      
-      // Si está vacío, volver a la primera liga
-      if(!q) { 
-        if(banner) banner.classList.remove('hidden'); 
-        const firstLeague = Object.keys(TEAMS)[0];
-        if(firstLeague) filterByLeague(firstLeague); 
-        return; 
-      }
-      
-      // Ocultar banner de promo durante búsqueda
+      if(!q) { if(banner) banner.classList.remove('hidden'); const first=Object.keys(TEAMS)[0]; if(first) filterByLeague(first); return; }
       if(banner) banner.classList.add('hidden');
-      
       const results = [];
       Object.entries(TEAMS).forEach(([key, league]) => {
         const teams = Object.values(league.teams);
         teams.forEach(team => {
-          if(team.name.toLowerCase().includes(q) || league.name.toLowerCase().includes(q)) {
-            results.push({...team, leagueName: league.name, leagueKey: key});
-          }
+          if(team.name.toLowerCase().includes(q) || league.name.toLowerCase().includes(q)) results.push({...team, leagueName: league.name, leagueKey: key});
         });
       });
-
-      if(results.length === 0) { 
-        const g = document.getElementById('products-grid'); 
-        if(g) g.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400">No se encontraron resultados para "${q}"</div>`; 
-      } else {
-        renderProducts(null, results);
-      }
+      if(results.length===0) { const g=document.getElementById('products-grid'); if(g) g.innerHTML=`<div class="col-span-full text-center py-12 text-gray-400">No se encontraron resultados para "${q}"</div>`; }
+      else renderProducts(null, results);
     });
   }
 
@@ -417,19 +429,17 @@
     btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   }
 
-  // ================= INICIALIZACIÓN (CONECTADA A FIREBASE) =================
+  // ================= INICIALIZACIÓN =================
   function initApp() {
-    renderLeagueButtons();
-
+    // Muestra skeletons iniciales
+    renderProducts('loading');
+    
     db.ref('teams').on('value', (snapshot) => {
       TEAMS = snapshot.val() || {};
       renderLeagueButtons();
-      
       const currentLeagueBtn = document.querySelector('.league-btn.active');
       const leagueToLoad = currentLeagueBtn ? currentLeagueBtn.dataset.league : Object.keys(TEAMS)[0];
-      
       if(leagueToLoad && TEAMS[leagueToLoad]) renderProducts(leagueToLoad);
-      
       initViewerCounters();
     });
 
@@ -443,11 +453,8 @@
     document.addEventListener('keydown', e => { if(e.key==='Escape') closeCartModal(); });
   }
   
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
-  } else {
-    initApp();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp);
+  else initApp();
 
   window.filterByLeague=filterByLeague; window.selectSize=selectSize; window.togglePersonalization=togglePersonalization;
   window.changeKitImage=changeKitImage; window.addToCart=addToCart; window.openCartModal=openCartModal;
@@ -512,7 +519,11 @@
 
 <footer class="border-t border-gray-800 py-8 px-4 text-center text-gray-500 text-sm">
   <p>© 2026 La Hinchada • Réplicas no oficiales para coleccionistas</p>
-  <p class="mt-1">💳 Pago seguro • 📦 Envío gratis (~15 días)</p>
+  <p class="mt-2">
+    <a href="/" class="hover:text-neon transition-colors">Tienda</a> • 
+    <a href="/faq.html" class="hover:text-neon transition-colors">FAQ & Políticas</a> • 
+    <a href="/admin.html" class="hover:text-neon transition-colors">Admin</a>
+  </p>
 </footer>
 
 <div id="cart-modal" class="modal" onclick="if(event.target===this) closeCartModal()">

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>La Hinchada | FAQ - Preguntas Frecuentes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { dark: '#0f0f0f', 'dark-card': '#1a1a1a', neon: '#39ff14', gold: '#ffd700' }, fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } } }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body { background-color: #0f0f0f; color: #ffffff; font-family: 'Inter', sans-serif; }
+    .faq-item { cursor: pointer; transition: all 0.3s; }
+    .faq-item:hover { background-color: #252525; }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    .faq-answer.active { max-height: 500px; }
+  </style>
+</head>
+<body class="antialiased">
+
+<header class="sticky top-0 z-40 bg-dark/95 backdrop-blur-md border-b border-gray-800">
+  <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+    <a href="/" class="text-2xl font-bold text-neon">⚽ La Hinchada</a>
+    <nav class="flex gap-4">
+      <a href="/" class="text-gray-400 hover:text-white">Tienda</a>
+      <a href="/admin.html" class="text-gray-400 hover:text-white">Admin</a>
+    </nav>
+  </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 py-12">
+  <h1 class="text-4xl font-bold text-center mb-4">❓ Preguntas Frecuentes</h1>
+  <p class="text-gray-400 text-center mb-12">Resolvemos tus dudas sobre nuestras camisetas</p>
+
+  <div class="space-y-4">
+    <div class="faq-item bg-dark-card rounded-xl border border-gray-800 p-6" onclick="toggleFaq(this)">
+      <h3 class="font-semibold text-lg flex justify-between items-center">
+        ¿Las camisetas son originales?
+        <span class="text-neon text-2xl">+</span>
+      </h3>
+      <div class="faq-answer mt-4 text-gray-300">
+        <p>No, son <strong>réplicas de alta calidad (AAA)</strong> destinadas exclusivamente a coleccionistas. No están licenciadas por los clubes ni marcas oficiales. Ofrecemos un producto similar en apariencia pero a una fracción del precio.</p>
+      </div>
+    </div>
+
+    <div class="faq-item bg-dark-card rounded-xl border border-gray-800 p-6" onclick="toggleFaq(this)">
+      <h3 class="font-semibold text-lg flex justify-between items-center">
+        ¿Cuánto tarda el envío?
+        <span class="text-neon text-2xl">+</span>
+      </h3>
+      <div class="faq-answer mt-4 text-gray-300">
+        <p>El tiempo estimado es de <strong>10-20 días hábiles</strong> dependiendo de tu ubicación. Enviamos desde almacenes en Europa para minimizar aduanas. Recibirás un número de seguimiento cuando tu pedido sea despachado.</p>
+      </div>
+    </div>
+
+    <div class="faq-item bg-dark-card rounded-xl border border-gray-800 p-6" onclick="toggleFaq(this)">
+      <h3 class="font-semibold text-lg flex justify-between items-center">
+        ¿Cómo sé mi talla?
+        <span class="text-neon text-2xl">+</span>
+      </h3>
+      <div class="faq-answer mt-4 text-gray-300">
+        <p>Nuestras camisetas siguen la tabla de tallas europea estándar. Te recomendamos medir una camiseta que te quede bien y compararla con nuestras medidas. Si estás entre dos tallas, elige la mayor para un ajuste más cómodo.</p>
+      </div>
+    </div>
+
+    <div class="faq-item bg-dark-card rounded-xl border border-gray-800 p-6" onclick="toggleFaq(this)">
+      <h3 class="font-semibold text-lg flex justify-between items-center">
+        ¿Puedo personalizar con nombre y número?
+        <span class="text-neon text-2xl">+</span>
+      </h3>
+      <div class="faq-answer mt-4 text-gray-300">
+        <p>¡Sí! Por <strong>5€ adicionales</strong> puedes añadir nombre y número personalizados. Solo tienes que marcar la casilla "Personalizar" al añadir al carrito e introducir los datos. Usamos tipografía oficial de cada equipo.</p>
+      </div>
+    </div>
+
+    <div class="faq-item bg-dark-card rounded-xl border border-gray-800 p-6" onclick="toggleFaq(this)">
+      <h3 class="font-semibold text-lg flex justify-between items-center">
+        ¿Hay gastos de envío?
+        <span class="text-neon text-2xl">+</span>
+      </h3>
+      <div class="faq-answer mt-4 text-gray-300">
+        <p><strong>¡No! El envío es completamente gratuito</strong> a toda España y Europa. No hay costes ocultos ni mínimos de compra.</p>
+      </div>
+    </div>
+
+    <div class="faq-item bg-dark-card rounded-xl border border-gray-800 p-6" onclick="toggleFaq(this)">
+      <h3 class="font-semibold text-lg flex justify-between items-center">
+        ¿Qué métodos de pago aceptáis?
+        <span class="text-neon text-2xl">+</span>
+      </h3>
+      <div class="faq-answer mt-4 text-gray-300">
+        <p>Trabajamos vía <strong>WhatsApp y Telegram</strong> para mayor seguridad. Una vez confirmas tu pedido, te enviamos un enlace de pago seguro (PayPal, tarjeta o Bizum). No pedimos datos bancarios por la web.</p>
+      </div>
+    </div>
+
+    <div class="faq-item bg-dark-card rounded-xl border border-gray-800 p-6" onclick="toggleFaq(this)">
+      <h3 class="font-semibold text-lg flex justify-between items-center">
+        ¿Puedo devolver o cambiar una camiseta?
+        <span class="text-neon text-2xl">+</span>
+      </h3>
+      <div class="faq-answer mt-4 text-gray-300">
+        <p>Aceptamos cambios solo si hay <strong>defecto de fabricación</strong> o error en el pedido (talla/equipo incorrecto). Las personalizaciones (nombre/número) no admiten cambio salvo error nuestro. Contacta en las 48h siguientes a la recepción.</p>
+      </div>
+    </div>
+
+    <div class="faq-item bg-dark-card rounded-xl border border-gray-800 p-6" onclick="toggleFaq(this)">
+      <h3 class="font-semibold text-lg flex justify-between items-center">
+        ¿Cómo contacto con vosotros?
+        <span class="text-neon text-2xl">+</span>
+      </h3>
+      <div class="faq-answer mt-4 text-gray-300">
+        <p>Puedes escribirnos por <strong>WhatsApp</strong> o <strong>Telegram</strong> (enlaces en el footer). Respondemos en menos de 24h. También puedes usar el formulario de contacto si lo prefieres.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-12 text-center p-6 bg-dark-card rounded-xl border border-gray-800">
+    <h3 class="text-xl font-bold mb-2">¿No encuentras lo que buscas?</h3>
+    <p class="text-gray-400 mb-4">Escríbenos y te ayudamos personalmente</p>
+    <a href="/" class="inline-block bg-neon text-dark font-bold px-6 py-3 rounded-lg hover:bg-[#2ecc40]">Contactar por WhatsApp</a>
+  </div>
+</main>
+
+<footer class="border-t border-gray-800 py-8 px-4 text-center text-gray-500 text-sm mt-12">
+  <p>© 2026 La Hinchada • Réplicas no oficiales para coleccionistas</p>
+  <p class="mt-2">
+    <a href="/" class="hover:text-neon">Tienda</a> • 
+    <a href="/faq.html" class="hover:text-neon">FAQ</a> • 
+    <a href="/admin.html" class="hover:text-neon">Admin</a>
+  </p>
+</footer>
+
+<script>
+  function toggleFaq(element) {
+    const answer = element.querySelector('.faq-answer');
+    const icon = element.querySelector('.faq-item span');
+    const isActive = answer.classList.contains('active');
+    
+    // Cerrar todos
+    document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('active'));
+    document.querySelectorAll('.faq-item span').forEach(s => s.textContent = '+');
+    
+    // Abrir el clickeado si no estaba activo
+    if (!isActive) {
+      answer.classList.add('active');
+      icon.textContent = '-';
+    }
+  }
+</script>
+
+</body>
+</html>

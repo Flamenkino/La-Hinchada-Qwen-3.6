@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>La Hinchada | Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FIREBASE SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
@@ -19,7 +18,6 @@
 </head>
 <body class="p-6">
 
-  <!-- LOGIN -->
   <div id="login" class="max-w-md mx-auto mt-20 p-8 bg-neutral-900 rounded-xl border border-gray-800 text-center">
     <h2 class="text-2xl font-bold text-[#39ff14] mb-4">🔐 Acceso Admin</h2>
     <input type="email" id="email" placeholder="Tu email de admin">
@@ -27,7 +25,6 @@
     <button onclick="login()" class="btn btn-green w-full">Entrar</button>
   </div>
 
-  <!-- PANEL -->
   <div id="panel" class="hidden max-w-4xl mx-auto">
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-3xl font-bold text-[#39ff14]">⚙️ Gestión de Equipos</h1>
@@ -35,16 +32,25 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- AÑADIR -->
+      <!-- AÑADIR EQUIPO -->
       <div class="bg-neutral-900 p-6 rounded-xl border border-gray-800">
         <h3 class="text-xl font-bold mb-4">➕ Añadir Equipo</h3>
+        
         <label class="text-sm text-gray-400">Liga</label>
         <select id="sel-league"></select>
+        
         <label class="text-sm text-gray-400">Nombre Equipo</label>
         <input type="text" id="inp-name" placeholder="Ej: Real Madrid">
+        
         <label class="text-sm text-gray-400">Emoji / Badge</label>
         <input type="text" id="inp-badge" placeholder="Ej: ⚪">
+        
+        <div class="mt-4 p-3 bg-yellow-900/30 border border-yellow-700 rounded-lg mb-4">
+          <p class="text-xs text-yellow-300">📸 <strong>Importante:</strong> Después de guardar, sube la foto manualmente a GitHub en la carpeta <code>images/[liga]/</code> con el nombre: <br><code>nombreenminusculas1.png</code></p>
+        </div>
+
         <button onclick="addTeam()" class="btn btn-green w-full mt-2">Guardar Equipo</button>
+        
         <hr class="border-gray-800 my-4">
         <label class="text-sm text-gray-400">Añadir Nueva Liga</label>
         <div class="flex gap-2">
@@ -62,7 +68,6 @@
   </div>
 
 <script>
-  // 🔥 TU CONFIGURACIÓN DE FIREBASE (INTEGRADA)
   const firebaseConfig = {
     apiKey: "AIzaSyDPQHc1TPeyZLbmfLQDzin68r9vvM8jX8k",
     authDomain: "la-hinchada-cf1a2.firebaseapp.com",
@@ -93,6 +98,28 @@
   }
   function logout() { auth.signOut(); }
 
+  function addTeam() {
+    const leagueKey = document.getElementById('sel-league').value;
+    const name = document.getElementById('inp-name').value;
+    const badge = document.getElementById('inp-badge').value;
+
+    if (!name || !leagueKey) return alert("Completa los campos");
+
+    // Generamos un ID limpio para que coincida con las imágenes de GitHub
+    const cleanId = name.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 10);
+
+    db.ref(`teams/${leagueKey}/teams`).push({
+      id: cleanId,
+      name: name,
+      badge: badge || '',
+      imageUrl: null // No usamos Storage, la web buscará en carpetas
+    }).then(() => {
+      alert("✅ Equipo añadido. \n\n Ahora sube la foto a GitHub en la carpeta: images/" + leagueKey + "/" + cleanId + "1.png");
+      document.getElementById('inp-name').value = '';
+      document.getElementById('inp-badge').value = '';
+    });
+  }
+
   function loadLeagues() {
     const sel = document.getElementById('sel-league');
     sel.innerHTML = '';
@@ -115,7 +142,7 @@
       Object.entries(data).forEach(([leagueKey, league]) => {
         league.teams.forEach((team, idx) => {
           const teamsArr = league.teams;
-          const internalKey = Object.keys(teamsArr)[idx]; 
+          const internalKey = Object.keys(teamsArr)[idx];
           list.innerHTML += `
             <div class="flex justify-between items-center bg-dark p-2 rounded border border-gray-700">
               <span>${team.badge || '⚽'} ${team.name} <small class="text-gray-500">(${league.name})</small></span>
@@ -123,22 +150,6 @@
             </div>`;
         });
       });
-    });
-  }
-
-  function addTeam() {
-    const leagueKey = document.getElementById('sel-league').value;
-    const name = document.getElementById('inp-name').value;
-    const badge = document.getElementById('inp-badge').value;
-    if (!name || !leagueKey) return alert("Completa los campos");
-    db.ref(`teams/${leagueKey}/teams`).push({
-      id: name.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 4),
-      name: name,
-      badge: badge || '⚽'
-    }).then(() => {
-      alert("Añadido!");
-      document.getElementById('inp-name').value = '';
-      document.getElementById('inp-badge').value = '';
     });
   }
 
