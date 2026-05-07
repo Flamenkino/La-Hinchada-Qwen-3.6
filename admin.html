@@ -10,64 +10,77 @@
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
   <style>
     body { background-color: #0f0f0f; color: #ffffff; font-family: sans-serif; }
-    .btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: bold; cursor: pointer; }
+    .btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
     .btn-green { background-color: #39ff14; color: black; }
     .btn-red { background-color: #ef4444; color: white; }
     input, select { background: #1a1a1a; border: 1px solid #333; color: white; padding: 0.5rem; border-radius: 0.5rem; width: 100%; margin-bottom: 0.5rem; }
+    input:focus, select:focus { border-color: #39ff14; outline: none; }
   </style>
 </head>
-<body class="p-6">
+<body class="p-4 md:p-6">
 
-  <div id="login" class="max-w-md mx-auto mt-20 p-8 bg-neutral-900 rounded-xl border border-gray-800 text-center">
+  <!-- LOGIN -->
+  <div id="login" class="max-w-md mx-auto mt-20 p-8 bg-neutral-900 rounded-xl border border-gray-800 text-center shadow-lg">
     <h2 class="text-2xl font-bold text-[#39ff14] mb-4">🔐 Acceso Admin</h2>
+    <p class="text-gray-400 text-sm mb-6">Solo personal autorizado</p>
     <input type="email" id="email" placeholder="Tu email de admin">
     <input type="password" id="password" placeholder="Contraseña">
     <button onclick="login()" class="btn btn-green w-full">Entrar</button>
   </div>
 
-  <div id="panel" class="hidden max-w-4xl mx-auto">
-    <div class="flex justify-between items-center mb-8">
-      <h1 class="text-3xl font-bold text-[#39ff14]">⚙️ Gestión de Equipos</h1>
-      <button onclick="logout()" class="text-sm text-gray-400 underline">Cerrar sesión</button>
+  <!-- PANEL DE CONTROL -->
+  <div id="panel" class="hidden max-w-5xl mx-auto">
+    <div class="flex justify-between items-center mb-8 border-b border-gray-800 pb-4">
+      <h1 class="text-3xl font-bold text-[#39ff14]">⚙️ Panel de Gestión</h1>
+      <button onclick="logout()" class="text-sm text-gray-400 hover:text-white underline">Cerrar sesión</button>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
       <!-- AÑADIR EQUIPO -->
-      <div class="bg-neutral-900 p-6 rounded-xl border border-gray-800">
-        <h3 class="text-xl font-bold mb-4">➕ Añadir Equipo</h3>
+      <div class="bg-neutral-900 p-6 rounded-xl border border-gray-800 shadow-lg">
+        <h3 class="text-xl font-bold mb-4 text-white">➕ Añadir Equipo</h3>
         
         <label class="text-sm text-gray-400">Liga</label>
         <select id="sel-league"></select>
         
-        <label class="text-sm text-gray-400">Nombre Equipo</label>
+        <label class="text-sm text-gray-400 mt-2 block">Nombre Equipo</label>
         <input type="text" id="inp-name" placeholder="Ej: Real Madrid">
         
-        <label class="text-sm text-gray-400">Emoji / Badge</label>
+        <label class="text-sm text-gray-400 mt-2 block">Emoji / Badge</label>
         <input type="text" id="inp-badge" placeholder="Ej: ⚪">
         
-        <div class="mt-4 p-3 bg-yellow-900/30 border border-yellow-700 rounded-lg mb-4">
-          <p class="text-xs text-yellow-300">📸 <strong>Importante:</strong> Después de guardar, sube la foto manualmente a GitHub en la carpeta <code>images/[liga]/</code> con el nombre: <br><code>nombreenminusculas1.png</code></p>
+        <div class="mt-4 p-3 bg-yellow-900/20 border border-yellow-800 rounded-lg text-xs text-yellow-400">
+          📸 <strong>Recuerda:</strong> Sube la foto a GitHub en <code>images/[liga]/nombreequipo1.png</code>
         </div>
 
-        <button onclick="addTeam()" class="btn btn-green w-full mt-2">Guardar Equipo</button>
+        <button onclick="addTeam()" class="btn btn-green w-full mt-4">Guardar Equipo</button>
         
-        <hr class="border-gray-800 my-4">
-        <label class="text-sm text-gray-400">Añadir Nueva Liga</label>
-        <div class="flex gap-2">
+        <hr class="border-gray-800 my-6">
+        
+        <label class="text-sm text-gray-400">➕ Añadir Nueva Liga</label>
+        <div class="flex gap-2 mt-2">
           <input type="text" id="inp-new-league" placeholder="Clave (ej: laliga)" class="mb-0">
-          <button onclick="addLeague()" class="btn btn-green">Crear</button>
+          <button onclick="addLeague()" class="btn btn-green px-4">Crear</button>
         </div>
       </div>
 
-      <!-- LISTA -->
-      <div class="bg-neutral-900 p-6 rounded-xl border border-gray-800">
-        <h3 class="text-xl font-bold mb-4">📋 Borrar Equipos</h3>
-        <div id="list" class="space-y-3 max-h-[500px] overflow-y-auto pr-2"></div>
+      <!-- LISTA Y BORRAR -->
+      <div class="bg-neutral-900 p-6 rounded-xl border border-gray-800 shadow-lg">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold text-white">📋 Equipos Activos</h3>
+          <span class="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded">Editar / Borrar</span>
+        </div>
+        <div id="list" class="space-y-2 max-h-[550px] overflow-y-auto pr-2 scrollbar-thin">
+          <p class="text-gray-500 text-center py-4">Cargando lista...</p>
+        </div>
       </div>
     </div>
   </div>
 
 <script>
+  // 🔥 CONFIGURACIÓN FIREBASE
   const firebaseConfig = {
     apiKey: "AIzaSyDPQHc1TPeyZLbmfLQDzin68r9vvM8jX8k",
     authDomain: "la-hinchada-cf1a2.firebaseapp.com",
@@ -82,49 +95,57 @@
   const db = firebase.database();
   const auth = firebase.auth();
 
+  // 🔐 AUTENTICACIÓN
   auth.onAuthStateChanged(user => {
     if (user) {
       document.getElementById('login').classList.add('hidden');
       document.getElementById('panel').classList.remove('hidden');
       loadLeagues();
       loadTeams();
+    } else {
+      document.getElementById('login').classList.remove('hidden');
+      document.getElementById('panel').classList.add('hidden');
     }
   });
 
   function login() {
     const e = document.getElementById('email').value;
     const p = document.getElementById('password').value;
+    if(!e || !p) return alert("Completa email y contraseña");
     auth.signInWithEmailAndPassword(e, p).catch(err => alert("Error: " + err.message));
   }
   function logout() { auth.signOut(); }
 
+  // 📝 AÑADIR EQUIPO
   function addTeam() {
     const leagueKey = document.getElementById('sel-league').value;
-    const name = document.getElementById('inp-name').value;
-    const badge = document.getElementById('inp-badge').value;
+    const name = document.getElementById('inp-name').value.trim();
+    const badge = document.getElementById('inp-badge').value.trim();
 
-    if (!name || !leagueKey) return alert("Completa los campos");
+    if (!name || !leagueKey) return alert("⚠️ Selecciona liga y escribe el nombre.");
 
-    // Generamos un ID limpio para que coincida con las imágenes de GitHub
+    // ID limpio para coincidir con GitHub
     const cleanId = name.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 10);
 
     db.ref(`teams/${leagueKey}/teams`).push({
       id: cleanId,
       name: name,
-      badge: badge || '',
-      imageUrl: null // No usamos Storage, la web buscará en carpetas
+      badge: badge || '⚽',
+      imageUrl: null 
     }).then(() => {
-      alert("✅ Equipo añadido. \n\n Ahora sube la foto a GitHub en la carpeta: images/" + leagueKey + "/" + cleanId + "1.png");
+      alert(`✅ Equipo "${name}" añadido.\n\n No olvides subir la foto "${cleanId}1.png" a GitHub.`);
       document.getElementById('inp-name').value = '';
       document.getElementById('inp-badge').value = '';
-    });
+    }).catch(err => alert("Error: " + err.message));
   }
 
+  // 📋 CARGAR LIGAS
   function loadLeagues() {
     const sel = document.getElementById('sel-league');
-    sel.innerHTML = '';
+    sel.innerHTML = '<option value="">Cargando ligas...</option>';
     db.ref('teams').on('value', snap => {
       const data = snap.val() || {};
+      sel.innerHTML = '';
       Object.keys(data).forEach(key => {
         const opt = document.createElement('option');
         opt.value = key;
@@ -134,37 +155,62 @@
     });
   }
 
+  //  CARGAR EQUIPOS Y BOTÓN BORRAR
   function loadTeams() {
     const list = document.getElementById('list');
     db.ref('teams').on('value', snap => {
       list.innerHTML = '';
       const data = snap.val() || {};
-      Object.entries(data).forEach(([leagueKey, league]) => {
-        league.teams.forEach((team, idx) => {
-          const teamsArr = league.teams;
-          const internalKey = Object.keys(teamsArr)[idx];
+      
+      // Ordenar por nombre de liga
+      const sortedKeys = Object.keys(data).sort();
+      
+      sortedKeys.forEach(leagueKey => {
+        const league = data[leagueKey];
+        // Obtener equipos como lista de objetos
+        const teams = Object.entries(league.teams || {});
+        
+        if(teams.length === 0) return;
+
+        list.innerHTML += `<p class="text-neon text-xs font-bold uppercase mt-4 mb-2 border-b border-gray-800 pb-1">${league.name}</p>`;
+
+        teams.forEach(([firebaseKey, team]) => {
           list.innerHTML += `
-            <div class="flex justify-between items-center bg-dark p-2 rounded border border-gray-700">
-              <span>${team.badge || '⚽'} ${team.name} <small class="text-gray-500">(${league.name})</small></span>
-              <button onclick="deleteTeam('${leagueKey}', '${internalKey}')" class="btn btn-red text-xs px-2 py-1">🗑️</button>
+            <div class="flex justify-between items-center bg-dark p-2 rounded border border-gray-800 hover:border-gray-600 transition-colors">
+              <div class="flex items-center gap-2 truncate">
+                <span class="text-lg">${team.badge || '⚽'}</span>
+                <span class="text-sm font-medium truncate">${team.name}</span>
+              </div>
+              <button onclick="deleteTeam('${leagueKey}', '${firebaseKey}', '${team.name}')" class="btn btn-red text-xs px-2 py-1 ml-2">🗑️</button>
             </div>`;
         });
       });
     });
   }
 
-  function addLeague() {
-    const key = document.getElementById('inp-new-league').value;
-    const name = prompt("Nombre de la liga (Ej: Primera División):");
-    if(key && name) {
-      db.ref(`teams/${key}`).set({ name: name, teams: [] });
-      document.getElementById('inp-new-league').value = '';
-    }
+  // 🗑️ BORRAR EQUIPO
+  function deleteTeam(leagueKey, firebaseKey, teamName) {
+    if(!confirm(`¿Eliminar "${teamName}"?`)) return;
+    
+    db.ref(`teams/${leagueKey}/teams/${firebaseKey}`).remove()
+      .then(() => {
+        // Opcional: eliminar carpeta de GitHub si se pudiera (aquí no es posible)
+        console.log("Borrado OK");
+      })
+      .catch(err => alert("Error al borrar: " + err.message));
   }
 
-  function deleteTeam(leagueKey, internalKey) {
-    if(!confirm("¿Seguro que quieres borrarlo?")) return;
-    db.ref(`teams/${leagueKey}/teams/${internalKey}`).remove();
+  // ➕ AÑADIR LIGA
+  function addLeague() {
+    const key = document.getElementById('inp-new-league').value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    if(!key) return alert("Escribe una clave válida (ej: laliga)");
+    
+    const name = prompt("Nombre visible de la liga (Ej: Primera División):");
+    if(name) {
+      db.ref(`teams/${key}`).set({ name: name, teams: {} });
+      document.getElementById('inp-new-league').value = '';
+      alert("✅ Liga creada.");
+    }
   }
 </script>
 </body>
